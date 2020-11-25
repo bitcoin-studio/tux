@@ -1,4 +1,3 @@
-
 import { DiagramModel, LinkModel } from '@projectstorm/react-diagrams';
 import * as Bitcoin from 'bitcoinjs-lib';
 import { OutputLinkModel } from '../DiagramComponents/OutputLink';
@@ -6,24 +5,32 @@ import { SpendLinkModel } from '../DiagramComponents/SpendLink/SpendLinkModel';
 import { TransactionNodeModel } from '../DiagramComponents/TransactionNode/TransactionNodeModel';
 import { HasKeys, InputMap, TXID } from '../util';
 import { Viewer } from '../UX/EntityViewer';
-import { NodeColor, UTXOFormatData } from './ContractManager';
+import { NodeColor, TransactionData, UTXOFormatData } from './ContractManager';
 import './Transaction.css';
 import { UTXOMetaData, UTXOModel } from './UTXO';
-import {TransactionData} from './ContractManager';
 
-export class TransactionModel extends TransactionNodeModel implements Viewer, HasKeys {
+export class TransactionModel
+    extends TransactionNodeModel
+    implements Viewer, HasKeys {
     broadcastable: boolean;
     broadcastable_hook: (b: boolean) => void;
     tx: Bitcoin.Transaction;
     witness_set: Array<Array<Buffer[]>>;
-
     utxo_models: Array<UTXOModel>;
     public utxo_links: Array<OutputLinkModel>;
     public input_links: Array<SpendLinkModel>;
-    constructor(tx: Bitcoin.Transaction, all_witnesses: Buffer[][][], update: any, name: string, color: NodeColor, utxo_labels: Array<UTXOFormatData | null>) {
+
+    constructor(
+        tx: Bitcoin.Transaction,
+        all_witnesses: Buffer[][][],
+        update: any,
+        name: string,
+        color: NodeColor,
+        utxo_labels: Array<UTXOFormatData | null>
+    ) {
         super(tx.getId().substr(0, 16), name, color.get());
         this.broadcastable = false;
-        this.broadcastable_hook = (b) => { };
+        this.broadcastable_hook = (b) => {};
         this.tx = tx;
         this.utxo_models = [];
         this.utxo_links = [];
@@ -32,59 +39,81 @@ export class TransactionModel extends TransactionNodeModel implements Viewer, Ha
         for (let y = 0; y < this.tx.outs.length; ++y) {
             const subcolor = color.clone();
             subcolor.fade();
-            let metadata = utxo_labels[y] || { color: subcolor.get(), label: name };
+            const metadata = utxo_labels[y] || {
+                color: subcolor.get(),
+                label: name,
+            };
             // TODO: Get rid of assertion
             const out: Bitcoin.TxOutput = <Bitcoin.TxOutput>tx.outs[y];
-            let utxo = new UTXOModel(new UTXOMetaData(out.script, out.value, tx, y), update, metadata.label, new NodeColor(metadata.color), this);
+            const utxo = new UTXOModel(
+                new UTXOMetaData(out.script, out.value, tx, y),
+                update,
+                metadata.label,
+                new NodeColor(metadata.color),
+                this
+            );
             this.utxo_models.push(utxo);
-            this.utxo_links.push(this.addOutPort('out' + y).link(utxo.addInPort('create')));
+            this.utxo_links.push(
+                // @ts-ignore
+                this.addOutPort(`out${y}`).link(utxo.addInPort('create'))
+            );
         }
         this.registerListener({
-            selectionChanged: update
+            selectionChanged: update,
         });
     }
 
     get_json(): TransactionData {
-       return {
-           hex : this.tx.toHex(),
-           label: this.name,
-           color: this.color,
-           utxo_metadata: this.utxo_models.map((u) => { return {color: u.getOptions().color, label: u.getOptions().name}; } ),
-       };
+        return {
+            hex: this.tx.toHex(),
+            label: this.name,
+            color: this.color,
+            utxo_metadata: this.utxo_models.map((u) => ({
+                color: u.getOptions().color,
+                label: u.getOptions().name,
+            })),
+        };
     }
 
-    setReachable(b:boolean) {
+    setReachable(b: boolean) {
         // Turns on/off the widget banner
         super.setReachable(b);
         //  Turns off the outputs animinations
-        for(const utxo_model of this.utxo_models) {
+        for (const utxo_model of this.utxo_models) {
             utxo_model.setReachable(b);
         }
         // Turns off the inputs animations
-        for(const input_link of this.input_links) {
+        for (const input_link of this.input_links) {
             input_link.setReachable(b);
         }
     }
+
     get_txid(): TXID {
         return this.tx.getId();
     }
+
     remove_from_model(model: DiagramModel) {
         if (!(this instanceof PhantomTransactionModel)) {
+            // @ts-ignore
             model.removeNode(this);
-            this.utxo_links.map((x) => model.removeLink(<LinkModel><unknown>x));
+            this.utxo_links.map((x) =>
+                model.removeLink(<LinkModel>(<unknown>x))
+            );
         }
         this.utxo_models.map((x) => model.removeNode(x));
-        this.input_links.map((x) => model.removeLink(<LinkModel><unknown>x));
+        this.input_links.map((x) => model.removeLink(<LinkModel>(<unknown>x)));
     }
+
     is_broadcastable() {
         return this.broadcastable;
     }
+
     set_broadcastable(b = true) {
-        if (b !== this.broadcastable)
-            this.broadcastable_hook(b);
+        if (b !== this.broadcastable) this.broadcastable_hook(b);
         this.broadcastable = b;
     }
-    set_broadcastable_hook(hook = (b: boolean) => { }) {
+
+    set_broadcastable_hook(hook = (b: boolean) => {}) {
         this.broadcastable_hook = hook;
     }
 
@@ -104,9 +133,16 @@ export class TransactionModel extends TransactionNodeModel implements Viewer, Ha
             const tx = mtx.tx;
             // now remove children
             for (let i = 0; i < tx.outs.length; ++i) {
-                const to_prune: Array<TransactionModel> | undefined = inputs_map.get({ hash: tx.getHash(), index: i });
+                const to_prune:
+                    | Array<TransactionModel>
+                    | undefined = inputs_map.get({
+                    hash: tx.getHash(),
+                    index: i,
+                });
                 if (to_prune) {
-                    to_prune.forEach((txn_model) => txn_model.remove_from_model(model));
+                    to_prune.forEach((txn_model) =>
+                        txn_model.remove_from_model(model)
+                    );
                     to_clear.push(...to_prune);
                 }
             }
@@ -114,15 +150,23 @@ export class TransactionModel extends TransactionNodeModel implements Viewer, Ha
     }
 }
 
-
 export class PhantomTransactionModel extends TransactionModel {
-    override_txid : TXID;
-    constructor(override_txid: TXID, tx: Bitcoin.Transaction, all_witnesses: Buffer[][][], update: any, name: string, color: NodeColor, utxo_labels: Array<UTXOFormatData | null>) {
+    override_txid: TXID;
+
+    constructor(
+        override_txid: TXID,
+        tx: Bitcoin.Transaction,
+        all_witnesses: Buffer[][][],
+        update: any,
+        name: string,
+        color: NodeColor,
+        utxo_labels: Array<UTXOFormatData | null>
+    ) {
         super(tx, all_witnesses, update, name, color, utxo_labels);
         this.override_txid = override_txid;
-
     }
-    get_txid() : TXID {
+
+    get_txid(): TXID {
         return this.override_txid;
     }
 }

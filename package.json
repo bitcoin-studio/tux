@@ -1,66 +1,79 @@
 {
-  "name": "vaults",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "@emotion/core": "^10.0.27",
-    "@emotion/styled": "^10.0.27",
-    "@ibm/plex": "^5.1.0",
-    "@projectstorm/react-canvas-core": "^6.0.0-beta.0",
-    "@projectstorm/react-diagrams": "^6.0.1-beta.7",
-    "@projectstorm/react-diagrams-core": "^6.0.1-beta.7",
-    "@projectstorm/react-diagrams-defaults": "^6.0.1-beta.7",
-    "@projectstorm/react-diagrams-routing": "^6.0.1-beta.7",
-    "@rjsf/core": "^2.0.0",
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.3.2",
-    "@testing-library/user-event": "^7.1.2",
-    "@types/color": "^3.0.1",
-    "@types/lodash": "^4.14.150",
-    "@types/react-bootstrap": "^1.0.0",
-    "bitcoin-core": "^3.0.0",
-    "bitcoinjs-lib": "^5.1.6",
-    "bootstrap": "^4.4.1",
-    "closest": "^0.0.1",
-    "color": "^3.1.2",
-    "dagre": "^0.8.5",
-    "esm": "^3.2.25",
-    "http-proxy-middleware": "^1.0.3",
-    "lodash": "^4.17.15",
-    "mathjs": "^6.2.5",
-    "pathfinding": "^0.4.18",
-    "paths-js": "^0.4.10",
-    "react": "^16.12.0",
-    "react-bootstrap": "^1.0.0",
-    "react-dom": "^16.12.0",
-    "react-scripts": "3.3.0",
-    "resize-observer-polyfill": "^1.5.1",
-    "typescript": "^3.7.4"
-  },
-  "main": "./desktop/main.js",
-  "scripts": {
-    "start-react": "export BROWSER=none REACT_EDITOR=none && react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "start-electron": "export ELECTRON_START_URL='http://localhost:3000' && electron ."
-  },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
-  "devDependencies": {
-    "electron": "^9.2.1"
-  }
+    "name": "vaults",
+    "version": "0.1.0",
+    "private": true,
+    "dependencies": {
+        "@emotion/core": "^10.0.27",
+        "@emotion/styled": "^10.0.27",
+        "@ibm/plex": "^5.1.3",
+        "@projectstorm/react-canvas-core": "^6.2.0",
+        "@projectstorm/react-diagrams": "^6.2.0",
+        "@projectstorm/react-diagrams-core": "^6.2.0",
+        "@projectstorm/react-diagrams-defaults": "^6.2.0",
+        "@projectstorm/react-diagrams-routing": "^6.2.0",
+        "@rjsf/core": "^2.0.0",
+        "@testing-library/jest-dom": "^4.2.4",
+        "@testing-library/react": "^9.3.2",
+        "@testing-library/user-event": "^7.1.2",
+        "@types/color": "^3.0.1",
+        "@types/lodash": "^4.14.165",
+        "@types/react-bootstrap": "^1.0.0",
+        "bitcoin-core": "^3.0.0",
+        "bitcoinjs-lib": "^5.2.0",
+        "bootstrap": "^4.5.3",
+        "closest": "^0.0.1",
+        "color": "^3.1.2",
+        "concurrently": "^5.3.0",
+        "dagre": "^0.8.5",
+        "eslint-plugin-import": "^2.22.1",
+        "esm": "^3.2.25",
+        "http-proxy-middleware": "^1.0.3",
+        "lodash": "^4.17.15",
+        "mathjs": "^6.2.5",
+        "ml-matrix": "^6.5.3",
+        "pathfinding": "^0.4.18",
+        "paths-js": "^0.4.10",
+        "prettier": "^2.2.0",
+        "react": "^16.12.0",
+        "react-bootstrap": "^1.4.0",
+        "react-dom": "^16.12.0",
+        "react-scripts": "4.0.1",
+        "resize-observer-polyfill": "^1.5.1",
+        "typescript": "^3.7.4"
+    },
+    "main": "./desktop/main.js",
+    "scripts": {
+        "build": "react-scripts build",
+        "eject": "react-scripts eject",
+        "lint": "eslint --ext .ts,.tsx src/ --fix",
+        "prettier": "prettier --write src",
+        "prettier:check": "prettier --check src",
+        "start": "concurrently \"yarn:start-electron\" \"yarn:start-react\"",
+        "start-electron": "export ELECTRON_START_URL='http://localhost:3000' && electron .",
+        "start-react": "export BROWSER=none REACT_EDITOR=none && react-scripts start",
+        "test": "react-scripts test"
+    },
+    "browserslist": {
+        "production": [
+            ">0.2%",
+            "not dead",
+            "not op_mini all"
+        ],
+        "development": [
+            "last 1 chrome version",
+            "last 1 firefox version",
+            "last 1 safari version"
+        ]
+    },
+    "devDependencies": {
+        "@typescript-eslint/eslint-plugin": "^4.8.2",
+        "@typescript-eslint/parser": "^4.8.2",
+        "electron": "^9.2.1",
+        "eslint-config-airbnb-typescript": "^12.0.0",
+        "eslint-config-prettier": "^6.15.0",
+        "eslint-plugin-jsx-a11y": "^6.4.1",
+        "eslint-plugin-prettier": "^3.1.4",
+        "eslint-plugin-react": "^7.21.5",
+        "eslint-plugin-react-hooks": "^4.2.0"
+    }
 }
